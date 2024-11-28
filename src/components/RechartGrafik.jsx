@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,59 +11,38 @@ import {
   Filler,
 } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+// Chart.js registratsiyasi
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-const RechartGrafik = () => {
-  const [chartInfo, setChartInfo] = useState([]);
-  const sampleData = [12, 33, 55, 70, 23, 40, 58];
+const RechartGrafik = ({ data = [], labels = [] }) => {
+  // Ma'lumotlar tekshiruvi
+  if (!data.length || !labels.length) {
+    return <p>Grafik uchun ma'lumotlar mavjud emas</p>;
+  }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://trello.vimlc.uz/knowlodge");
-        const data = await response.json();
-
-        const apiData = data?.map((item) => item.value) || []; 
-        setChartInfo(apiData);
-      } catch (error) {
-        console.error("Ma'lumotni olishda xatolik yuz berdi:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-console.log(chartInfo);
-
+  // Canvas ma'lumotlari
   const canvasData = {
-    labels: [12.06, 18.06, "03.07", 13.07, 14.07, 20.07, 24.07],
+    labels: labels,
     datasets: [
       {
-        label: "Home",
+        label: "Grafik",
         borderColor: "#0E9CFF",
         pointRadius: 4,
         fill: true,
-        backgroundColor: "transparent",
-        lineTension: 0.4,
-        data: chartInfo.length > 0 ? chartInfo : sampleData,
+        backgroundColor: "rgba(14, 156, 255, 0.2)", // Yengil ko'k rang
+        tension: 0.4, // Silliq chiziq
+        data: data,
         borderWidth: 2,
       },
     ],
   };
 
+  // Grafik opsiyalari
   const options = {
     scales: {
       x: {
         ticks: {
-          color: "black",
+          color: "#333", // O'q belgilari rangi
           font: {
             family: "Nunito",
             size: 12,
@@ -72,14 +50,11 @@ console.log(chartInfo);
         },
       },
       y: {
-        border: {
-          display: false,
-        },
         min: 0,
         max: 100,
         ticks: {
           stepSize: 25,
-          color: "black",
+          color: "#333",
           font: {
             family: "Nunito",
             size: 12,
@@ -93,27 +68,28 @@ console.log(chartInfo);
       legend: {
         display: false,
       },
-      title: {
-        display: false,
+      tooltip: {
+        callbacks: {
+          label: (context) => `Qiymat: ${context.raw}`, // Tooltip formati
+        },
       },
     },
   };
 
+  // Inline-stil o'rniga CSS dan foydalanishni tavsiya etiladi
   const graphStyle = {
     minHeight: "193px",
     maxWidth: "333px",
     width: "100%",
     borderRadius: "0.375rem",
     padding: "0.5rem",
+    backgroundColor: "#FFF",
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
   };
 
   return (
     <div style={graphStyle}>
-      {chartInfo.length > 0 || sampleData.length > 0 ? (
-        <Line id="home" options={options} data={canvasData} />
-      ) : (
-        <p>Yuklanmoqda...</p>
-      )}
+      <Line options={options} data={canvasData} />
     </div>
   );
 };

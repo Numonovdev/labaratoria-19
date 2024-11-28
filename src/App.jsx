@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 function App() {
 
   const [user, setUser] = useState([]);
+  const [datas, setDatas] = useState([]);
+
   const chart2 = 78;
 
   useEffect(() => {
@@ -28,7 +30,21 @@ function App() {
   }, []);
 console.log(user);
 
-
+useEffect(() => {
+  fetch("https://trello.vimlc.uz/knowlodge")
+  .then((res) => {
+    if (res.status == 200) {
+      return res.json();
+    }
+  })
+    .then((data) => {
+      setDatas([data]);
+      // console.log(data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }, []);
 
 
 
@@ -127,16 +143,28 @@ console.log(user);
               <CircularBars />
             </div>
             <div>
-            <RechartGrafik />
-            <div>
-                <h1 className="text-[48px] text-[#0956AF] font-medium">{chart2}%</h1>
-                <div className="w-[333px] h-[45px] rounded-lg bg-[#DEE2E6]">
-                  <div
-                    className="h-full rounded-lg"
-                    style={{ width: `${chart2}%`, backgroundColor: "#28A264" }}
-                  ></div>
-                </div>
-              </div>
+            {datas.length > 0 &&
+                datas.map(function (data) {
+                  return (
+                    <>
+                    <RechartGrafik
+                      data={data.lineChart.data}
+                      labels={data.lineChart.labels}
+                      />
+                      <div>
+                      <h1 className="text-[48px] text-[#0956AF] font-medium">
+                        {data.lineChart.thanOthers}%
+                      </h1>
+                      <div className="w-[333px] h-[45px] rounded-lg bg-[#DEE2E6]">
+                        <div
+                          className="h-full rounded-lg"
+                          style={{ width: `${chart2}%`, backgroundColor: "#28A264" }}
+                        ></div>
+                      </div>
+                    </div>
+                    </>    
+                  );
+                })}
             </div>
 
             {/* uchinchi grafikga o`xshashni chatgpt dan foydalandim o`rganishga lekin barbir yaxshi tushinib eplolmadim shunga o`chirib rasm joyladim  */}
